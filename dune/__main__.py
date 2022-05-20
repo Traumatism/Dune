@@ -1,7 +1,7 @@
 import rich
 import typing
 
-from dune.table import Table
+from dune.table import Table, TableStr
 from dune.database import Database
 
 
@@ -17,7 +17,9 @@ class MyDB(Database):
 
     users: Table[User] = Table("users")  # table that stores User objects
     ids: Table[int] = Table("ids")  # table that stores ints
-    phones: Table[str] = Table("phones")  # table that stores strings
+
+    phones: TableStr[str] = TableStr("phones")  # table that stores strings
+    names: TableStr[str] = TableStr("names")  # table that stores strings
 
 
 db = MyDB()
@@ -29,6 +31,17 @@ db.users.insert(User("Jack", 23))
 db.phones.insert("+1-555-123-4567")
 db.phones.insert("+1-555-123-4568")
 db.phones.insert("+1-555-123-4569")
+
+db.names.insert("John")
+db.names.insert("Jenny")
+db.names.insert("Viktor")
+db.names.insert("Penny")
+db.names.insert("Jake")
+db.names.insert("Victor")
+db.names.insert("Jane")
+db.names.insert("Jack")
+
+rich.print(list(db.names.search("Vi")))
 
 # get users that are older than 23
 rich.print(list(db.users.get_func(lambda user: user.age >= 23)))

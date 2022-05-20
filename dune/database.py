@@ -6,6 +6,8 @@ import abc
 from .table import Table
 
 
+__all__ = ["Database"]
+
 T = typing.TypeVar("T")
 
 
@@ -15,22 +17,17 @@ class Database(metaclass=abc.ABCMeta):
     def __init__(self) -> None:
         self.tables: dict[str, Table] = {}
 
-        for annotation in self.__annotations__:
-
-            obj: Table = self.__getattribute__(annotation)
-
-            self.add_table(obj)
-
-    @property
-    def content(self) -> dict[str, dict[int, typing.Any]]:
-        """Export the DB as a JSON"""
-        return self.export()
+        map(
+            lambda table: self.add_table(self.__getattribute__(table)),
+            self.__annotations__,
+        )
 
     def add_table(self, table: Table) -> None:
         """Add a table to the database"""
         self.tables[table.name] = table
 
     def get_table(self, name: str) -> Table:
+        """Get table by name"""
         return self.tables[name]
 
     def export(self) -> dict[str, dict[int, typing.Any]]:

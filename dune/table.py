@@ -1,4 +1,7 @@
 import typing
+import re
+
+__alL__ = ["Table", "TableStr"]
 
 T = typing.TypeVar("T")
 
@@ -20,22 +23,28 @@ class Table(typing.Generic[T]):
         """Get the full content of the table"""
         return self.__content
 
-    def get(self, key: int) -> T:
+    def get(self, key: int) -> T | int:
         """Get an object from the table"""
-        return self.__content[key]
+        return self.__content.get(key, -1)
+
+    def get_key_from_value(self, value: T) -> int:
+        """Get the key of an object in the table"""
+        return next(
+            (key for key, val in self.__content.items() if val == value), -1
+        )
 
     def get_func(
         self, func: typing.Callable[[T], bool], limit: int = -1
-    ) -> typing.Iterable[T]:
+    ) -> typing.Iterable[tuple[int, T]]:
         """Get all objects from the table that match a condition"""
         yielded = 0
 
-        for value in self.content.values():
+        for key, value in self.content.items():
 
             if not func(value):
                 continue
 
-            yield value
+            yield key, value
 
             yielded += 1
 
@@ -48,11 +57,9 @@ class Table(typing.Generic[T]):
 
     def insert(self, value: T) -> int:
         """Insert a new object into the table"""
-        self.__content[
-            i := (max(self.content.keys()) if len(self.content) > 0 else 0) + 1
-        ] = value
-
-        return i
+        key = max(self.content.keys()) + 1 if len(self.content) > 0 else 0
+        self.__content[key] = value
+        return key
 
     def delete(self, key: int) -> T:
         """Delete an object from the table"""
@@ -61,3 +68,15 @@ class Table(typing.Generic[T]):
     def update(self, key: int, value: T) -> None:
         """Update an object in the table"""
         self.__content[key] = value
+
+
+class TableStr(typing.Generic[T], Table[str]):
+    """Table of strings"""
+
+    def search(self, value: str) -> typing.Iterable[tuple[int, str]]:
+        """Search for a string in the table"""
+        return self.get_func(lambda val: value in val)
+
+    def search_regex(self, regex: str) -> typing.Iterable[tuple[int, str]]:
+        """Search for a regex in the table"""
+        return self.get_func(lambda val: re.match(regex, val) is not None)
