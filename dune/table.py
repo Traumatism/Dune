@@ -75,8 +75,8 @@ class TableStr(typing.Generic[T], Table[str]):
 
     def search(self, value: str) -> typing.Iterable[tuple[int, str]]:
         """Search for a string in the table"""
-        return self.get_func(lambda val: value in val)
+        return self.get_func(lambda x: value in x)
 
     def search_regex(self, regex: str) -> typing.Iterable[tuple[int, str]]:
         """Search for a regex in the table"""
-        return self.get_func(lambda val: re.match(regex, val) is not None)
+        return self.get_func(lambda x: re.match(regex, x) is not None)
