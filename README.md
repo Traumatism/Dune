@@ -1,6 +1,6 @@
 # Dune
 
-Dune is a minimal key-value storing database built in Python 3.10+
+Dune is a minimal value storing database built in Python 3.10+
 
 Note: I made this project for my personnal use, but it can be used for any purpose. Be also careful about `get_func` method which is vulnerable to code injection by design.
 
