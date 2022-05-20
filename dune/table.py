@@ -28,7 +28,6 @@ class Table(typing.Generic[T]):
         self, func: typing.Callable[[T], bool], limit: int = -1
     ) -> typing.Iterable[T]:
         """Get all objects from the table that match a condition"""
-
         yielded = 0
 
         for value in self.content.values():
