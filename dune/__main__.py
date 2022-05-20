@@ -26,6 +26,10 @@ db.users.insert(User("John", 25))
 db.users.insert(User("Jane", 24))
 db.users.insert(User("Jack", 23))
 
+db.phones.insert("+1-555-123-4567")
+db.phones.insert("+1-555-123-4568")
+db.phones.insert("+1-555-123-4569")
+
 # get users that are older than 23
 rich.print(list(db.users.get_func(lambda user: user.age >= 23)))
 
