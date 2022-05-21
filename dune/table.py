@@ -1,6 +1,14 @@
 import re
 
-from typing import TypeVar, Generic, Callable, Iterable, Tuple, Dict, Union
+from typing import (
+    TypeVar,
+    Generic,
+    Callable,
+    Iterable,
+    Tuple,
+    Dict,
+    Union,
+)
 
 
 __all__ = ["Table", "TableStr"]
@@ -18,23 +26,23 @@ class Table(Generic[T]):
         self.__content: Dict[int, T] = {}
 
     @property
+    def content(self) -> Dict[int, T]:
+        """Get the table content"""
+        return self.__content
+
+    @property
     def name(self) -> str:
         """Get the name of the table"""
         return self.__name
 
-    @property
-    def content(self) -> Dict[int, T]:
-        """Get the full content of the table"""
-        return self.__content
-
     def get(self, key: int) -> Union[T, int]:
         """Get an object from the table"""
-        return self.__content.get(key, -1)
+        return self.content.get(key, -1)
 
     def get_key_from_value(self, value: T) -> int:
         """Get the key of an object in the table"""
         return next(
-            (key for key, val in self.__content.items() if val == value), -1
+            (key for key, val in self.content.items() if val == value), -1
         )
 
     def get_func(
@@ -47,7 +55,7 @@ class Table(Generic[T]):
 
         for key, value in self.content.items():
 
-            if not func(value):
+            if func(value) is False:
                 continue
 
             yield key, value
@@ -60,7 +68,7 @@ class Table(Generic[T]):
     def get_many(self, keys: Iterable[int]) -> Iterable[Row]:
         """Get multiple objects from the table"""
         for key in keys:
-            yield key, self.__content[key]
+            yield key, self.content[key]
 
     def insert(self, value: T) -> int:
         """Insert a new object into the table"""
@@ -84,7 +92,7 @@ class Table(Generic[T]):
 
     def update(self, key: int, value: T) -> None:
         """Update an object in the table"""
-        self.__content[key] = value
+        self.__content.update({key: value})
 
 
 class TableStr(Table[str]):

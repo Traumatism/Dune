@@ -2,67 +2,79 @@
 
 Dune is a minimal value storing database built in Python 3.10+
 
-Note: I made this project for my personnal use, but it can be used for any purpose. Be also careful about `get_func` method which is vulnerable to code injection by design.
+Note: I made this project for my personnal use, but it can be used for any purpose. Be also careful about `get_func` method which is 'vulnerable' to code injection by design.
 
-# Examples
+# FastAPI example
 
 ```python
-import rich
-import typing
+import fastapi
+import uvicorn
+import pydantic
 
-from dune.table import Table
-from dune.database import Database
+from .database import Database
+from .table import Table, TableStr
 
 
-class User(typing.NamedTuple):
-    """User object"""
+app = fastapi.FastAPI()
+
+
+class User(pydantic.BaseModel):
+    """User model"""
 
     name: str
     age: int
 
 
-class MyDB(Database):
-    """MyDB is a database"""
+class MyDatabase(Database):
+    """Database object"""
 
-    users: Table[User] = Table("users")  # table that stores User objects
-    ids: Table[int] = Table("ids")  # table that stores ints
-    phones: Table[str] = Table("phones")  # table that stores strings
+    users: Table[User] = Table("users")
+    countries: TableStr = TableStr("countries")
 
 
-db = MyDB()
+@app.get("/")
+def _():
+    return {"message": "Welcome to DuneDB demo"}
 
-db.users.insert(User("John", 25))
-db.users.insert(User("Jane", 24))
-db.users.insert(User("Jack", 23))
 
-db.phones.insert("+1-555-123-4567")
-db.phones.insert("+1-555-123-4568")
-db.phones.insert("+1-555-123-4569")
+@app.post("/users")
+def _(name: str, age: int):
+    """Add a new user"""
+    MyDatabase.users.insert(User(name=name, age=age))
+    return {}
 
-# get users that are older than 23
-rich.print(list(db.users.get_func(lambda user: user.age >= 23)))
 
-# get 1 users that are older than 23
-rich.print(list(db.users.get_func(lambda user: user.age >= 23, limit=1)))
+@app.get("/users")
+def _():
+    """Get last 100 users"""
+    return MyDatabase.users.get_func(lambda _: True, limit=100)
 
-rich.print(db.export())
-"""
-^ Will return:
 
-{
-    'users': {
-        1: User(name='John', age=25),
-        2: User(name='Jane', age=24),
-        3: User(name='Jack', age=23)
-    },
-    'ids': {},
-    'phones': {
-        1: '+1-555-123-4567',
-        2: '+1-555-123-4568',
-        3: '+1-555-123-4569'
-    }
-}
-"""
+@app.get("/users/{key}")
+def _(key: int):
+    """Get a user"""
+    return MyDatabase.users.get(key)
 
-rich.print(db.to_bin())
+
+@app.delete("/users/{key}")
+def _(key: int):
+    """Delete a user"""
+    MyDatabase.users.pop(key)
+    return {}
+
+
+@app.patch("/users/{key}")
+def _(key: int, name: str, age: int):
+    """Update a user"""
+    MyDatabase.users.update(key, User(name=name, age=age))
+    return {}
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "dune.__main__:app",
+        host="127.0.0.1",
+        port=2000,
+        reload=True,
+    )
 ```
