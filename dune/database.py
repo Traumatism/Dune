@@ -18,10 +18,16 @@ class Database(metaclass=abc.ABCMeta):
     def __init__(self) -> None:
         self.tables: Dict[str, Table] = {}
 
-        map(
-            lambda table: self.add_table(self.__getattribute__(table)),
-            self.__annotations__,
-        )
+        for table in self.__annotations__:
+            attr = getattr(self, table)
+
+            if not isinstance(attr, Table):
+                raise TypeError(f"{table} is not a Table")
+
+            self.add_table(attr)
+
+        if not len(self.tables):
+            raise ValueError("No tables defined")
 
     def add_table(self, table: Table) -> None:
         """Add a table to the database"""
@@ -40,6 +46,6 @@ class Database(metaclass=abc.ABCMeta):
         return zlib.compress(pickle.dumps(self.export()), level=9)
 
     @classmethod
-    def from_bin(cls, data: bytes) -> "Database":
+    def from_bin(cls, data: bytes) -> 'Database':
         """Deserialize the DB from a zlib(pickle(dict))"""
         return pickle.loads(zlib.decompress(data))

@@ -7,6 +7,8 @@ __all__ = ["Table", "TableStr"]
 
 T = TypeVar("T")
 
+Row = Tuple[int, T]
+
 
 class Table(Generic[T]):
     """Database table object"""
@@ -36,8 +38,10 @@ class Table(Generic[T]):
         )
 
     def get_func(
-        self, func: Callable[[T], bool], limit: int = -1
-    ) -> Iterable[Tuple[int, T]]:
+        self,
+        func: Callable[[T], bool],
+        limit: int = -1,
+    ) -> Iterable[Row]:
         """Get all objects from the table that match a condition"""
         yielded = 0
 
@@ -53,9 +57,10 @@ class Table(Generic[T]):
             if limit > 0 and yielded >= limit:
                 break
 
-    def get_many(self, keys: Iterable[int]) -> Iterable[T]:
+    def get_many(self, keys: Iterable[int]) -> Iterable[Row]:
         """Get multiple objects from the table"""
-        return (self.__content[key] for key in keys)
+        for key in keys:
+            yield key, self.__content[key]
 
     def insert(self, value: T) -> int:
         """Insert a new object into the table"""
@@ -64,6 +69,11 @@ class Table(Generic[T]):
         self.__content[key] = value
 
         return key
+
+    def insert_many(self, values: Iterable[T]) -> Iterable[int]:
+        """Insert multiple objects into the table"""
+        for value in values:
+            yield self.insert(value)
 
     def delete(self, key: int) -> T:
         """Delete an object from the table"""
