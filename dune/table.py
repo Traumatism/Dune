@@ -1,7 +1,6 @@
 import re
 
 from typing import TypeVar, Generic, Callable, Iterable, Tuple, Dict, Union
-from typing_extensions import reveal_type
 
 
 __all__ = ["Table", "TableStr"]
@@ -75,8 +74,12 @@ class Table(Generic[T]):
         """Insert multiple objects into the table"""
         yield from map(self.insert, values)
 
-    def delete(self, key: int) -> T:
+    def delete(self, key: int) -> None:
         """Delete an object from the table"""
+        del self.__content[key]
+
+    def pop(self, key: int) -> T:
+        """Pop an object from the table"""
         return self.__content.pop(key)
 
     def update(self, key: int, value: T) -> None:

@@ -22,7 +22,7 @@ class Database(metaclass=abc.ABCMeta):
             attr = getattr(self, table)
 
             if not isinstance(attr, Table):
-                raise TypeError(f"{table} is not a Table")
+                continue
 
             self.add_table(attr)
 
