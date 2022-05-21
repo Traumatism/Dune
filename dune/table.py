@@ -6,8 +6,8 @@ from typing import (
     Callable,
     Iterable,
     Tuple,
-    Dict,
     Union,
+    Dict,
 )
 
 

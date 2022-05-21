@@ -27,8 +27,7 @@ class MyDatabase(Database):
 
 
 if os.path.exists("backup.dune"):
-    with open("backup.dune", "rb") as f:
-        db = pickle.load(f)
+    db = pickle.load(open("backup.dune", "rb"))
 else:
     db = MyDatabase()
 
@@ -41,8 +40,7 @@ def _():
 @app.post("/users")
 def _(name: str, age: int):
     """Add a new user"""
-    db.users.insert(User(name=name, age=age))
-    return {}
+    return {"key": db.users.insert(User(name=name, age=age))}
 
 
 @app.get("/users")
