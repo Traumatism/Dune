@@ -1,21 +1,22 @@
-import typing
 import pickle
 import zlib
 import abc
+
+from typing import TypeVar, Any, Dict
 
 from .table import Table
 
 
 __all__ = ["Database"]
 
-T = typing.TypeVar("T")
+T = TypeVar("T")
 
 
 class Database(metaclass=abc.ABCMeta):
     """Manage all the tables"""
 
     def __init__(self) -> None:
-        self.tables: dict[str, Table] = {}
+        self.tables: Dict[str, Table] = {}
 
         map(
             lambda table: self.add_table(self.__getattribute__(table)),
@@ -30,7 +31,7 @@ class Database(metaclass=abc.ABCMeta):
         """Get table by name"""
         return self.tables[name]
 
-    def export(self) -> dict[str, dict[int, typing.Any]]:
+    def export(self) -> Dict[str, Dict[int, Any]]:
         """Export the DB as a JSON"""
         return {name: table.content for name, table in self.tables.items()}
 
@@ -38,7 +39,7 @@ class Database(metaclass=abc.ABCMeta):
         """Serialize the DB as a zlib(pickle(dict))"""
         return zlib.compress(pickle.dumps(self.export()), level=9)
 
-    # @classmethod
-    # def from_bin(cls, data: bytes) -> "Database":
-    #     """Deserialize the DB from a zlib(pickle(dict))"""
-    #     return cls(pickle.loads(zlib.decompress(data)))
+    @classmethod
+    def from_bin(cls, data: bytes) -> "Database":
+        """Deserialize the DB from a zlib(pickle(dict))"""
+        return pickle.loads(zlib.decompress(data))

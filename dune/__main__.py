@@ -18,8 +18,8 @@ class MyDB(Database):
     users: Table[User] = Table("users")  # table that stores User objects
     ids: Table[int] = Table("ids")  # table that stores ints
 
-    phones: TableStr[str] = TableStr("phones")  # table that stores strings
-    names: TableStr[str] = TableStr("names")  # table that stores strings
+    phones: TableStr = TableStr("phones")  # table that stores strings
+    names: TableStr = TableStr("names")  # table that stores strings
 
 
 db = MyDB()
