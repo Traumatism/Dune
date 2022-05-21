@@ -1,6 +1,6 @@
 import re
 
-from typing import TypeVar, Generic, Callable, Iterable, Tuple, Dict
+from typing import TypeVar, Generic, Callable, Iterable, Tuple, Dict, Union
 
 
 __all__ = ["Table", "TableStr"]
@@ -25,7 +25,7 @@ class Table(Generic[T]):
         """Get the full content of the table"""
         return self.__content
 
-    def get(self, key: int) -> T | int:
+    def get(self, key: int) -> Union[T, int]:
         """Get an object from the table"""
         return self.__content.get(key, -1)
 
