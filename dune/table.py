@@ -14,7 +14,6 @@ from typing import (
 __all__ = ["Table", "TableStr"]
 
 T = TypeVar("T")
-
 Row = Tuple[int, T]
 
 
@@ -67,8 +66,7 @@ class Table(Generic[T]):
 
     def get_many(self, keys: Iterable[int]) -> Iterable[Row]:
         """Get multiple objects from the table"""
-        for key in keys:
-            yield key, self.content[key]
+        yield from ((key, self.get(key)) for key in keys)
 
     def insert(self, value: T) -> int:
         """Insert a new object into the table"""
